@@ -1,0 +1,52 @@
+# ===============================
+.env
+# Node.js (server) dependencies
+# ===============================
+server/node_modules/
+server/package-lock.json
+server/.env
+dist/
+
+# ===============================
+# React (client) dependencies
+# ===============================
+client/node_modules/
+client/package-lock.json
+client/.env
+client/build/
+
+# ===============================
+# Root files
+# ===============================
+/node_modules/
+/package-lock.json
+/yarn.lock
+/pnpm-lock.yaml
+/.env
+
+# ===============================
+# Logs
+# ===============================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ===============================
+# Coverage
+# ===============================
+coverage/
+
+# ===============================
+# OS / Editor files
+# ===============================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ===============================
+# Misc
+# ===============================
+*.tmp
