@@ -1,17 +1,98 @@
 import React, { useState } from 'react'
 import Background from "@/assets/Background.png"
-import Victory from "@/assets/victory.svg";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from "@/components/ui/input"
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { LOGIN_ROUTE, SIGNUP_ROUTE } from '@/utils/constants';
+import { apiClient } from '@/lib/api-client';
+import { useNavigate } from 'react-router-dom';
+
 const Auth = () => {
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [value, setValue] = useState("login");
 
-  const handleLogin = async () => { }
-  const handleSignup = async () => { }
+  const navigate = useNavigate();
+  
+  const validateLogin = ()=>{
+    if(!email.length){
+      toast.error("Email is required")
+      return false;
+    }
+    if(!password.length)
+      {
+        toast.error("Password is required")
+      return false;
+    }
+    return true;
+  }
+
+  const validateSignup = () =>{
+    if(!email.length){
+      toast.error("Email is required")
+      return false;
+    }
+    if(!password.length)
+      {
+        toast.error("Password is required")
+      return false;
+    }
+    if(!confirmPassword.length)
+      {
+        toast.error("Please confirm your password")
+      return false;
+    }
+    if(confirmPassword !== password)
+    {
+      toast.error("Password and confirm password should be same")
+      return false;
+
+    }
+    return true;
+  }
+
+  const handleLogin = async () => { 
+    if(validateLogin()){
+    try {
+      const res = await apiClient.post(
+        LOGIN_ROUTE,
+        { email , password }
+      )
+      if(res.status === 201){
+        toast(res.data.message)
+        if(res.data.user.profileSetup) navigate("/chat")
+        else navigate("/profile")
+      }
+      console.log(res)
+    }
+    catch (error) 
+    {
+      toast(error.response.data.message)
+      console.log(error)
+    }
+  }
+}
+  const handleSignup = async () => {
+    if(validateSignup()){
+      try {
+        const res = await apiClient.post(
+          SIGNUP_ROUTE,
+          { email, password},
+          { withCredentials: true}
+        )
+        if(res.status === 201){
+        toast(res.data.message)
+        navigate("/profile");
+      }
+        console.log(res)
+      } catch (error) {
+        toast(error.response.data)
+        console.log(error)
+      }
+    }
+   }
 
   return (
     <div className="absolute top-0 z-[-2] h-screen w-screen bg-custom-gradient">
