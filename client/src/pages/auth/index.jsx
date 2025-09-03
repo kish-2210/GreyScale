@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { LOGIN_ROUTE, SIGNUP_ROUTE } from '@/utils/constants';
 import { apiClient } from '@/lib/api-client';
 import { useNavigate } from 'react-router-dom';
+import { useAppStore } from '@/store/index';
 
 const Auth = () => {
 
@@ -15,6 +16,7 @@ const Auth = () => {
   const [confirmPassword, setConfirmPassword] = useState("")
 
   const navigate = useNavigate();
+  const { setUserInfo } = useAppStore();
   
   const validateLogin = ()=>{
     if(!email.length){
@@ -54,21 +56,26 @@ const Auth = () => {
   }
 
   const handleLogin = async () => { 
+
     if(validateLogin()){
     try {
       const res = await apiClient.post(
         LOGIN_ROUTE,
         { email , password }
       )
-      if(res.status === 201){
+      
+      if(res.status === 200){
+        console.log(document.cookie);
+        setUserInfo(res.data.user)
         toast(res.data.message)
         if(res.data.user.profileSetup) navigate("/chat")
         else navigate("/profile")
       }
-      console.log(res)
+
     }
     catch (error) 
     {
+      console.log(`error : ${error}`)
       toast(error.response.data.message)
       console.log(error)
     }
@@ -84,6 +91,7 @@ const Auth = () => {
         )
         if(res.status === 201){
         toast(res.data.message)
+        setUserInfo(res.data.user)
         navigate("/profile");
       }
         console.log(res)

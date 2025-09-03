@@ -38,7 +38,7 @@ export const login = async(req,res) =>{
     try {
         const { email, password } = req.body;
         if(!email || !password){
-            return res.status(401).send("Email and password are required")
+            return res.status(401).json({message:"Email and password are required"})
         }
         const user = await User.findOne({email: email})
         if(!user){
@@ -50,7 +50,7 @@ export const login = async(req,res) =>{
         }
         else{
             res.cookie("jwt", createToken(email,user.id), {maxAge,secure: true, sameSite: "None"})
-            return res.status(201).json({
+            return res.status(200).json({
                 message: "Login Successful",
                 user:{
                   id: user.id,
@@ -67,4 +67,22 @@ export const login = async(req,res) =>{
         console.log(`Error: ${error}`);
         return res.status(501).send("Internal Server Error")
     }
+}
+
+export const getUserInfo = async(req,res) => {
+        try {
+            const userData = await User.findById(req.userId)
+            if(!userData) return res.status(404).Send("UserId not found")
+            return res.status(200).json({
+                 id: userData.id,
+                  email: userData.email,
+                  firstName: userData.firstName,
+                  lastName : userData.lastName,
+                  image: userData.image,
+                  color: userData.color,
+        })
+        } catch (error){
+          console.log( { error });
+          return res.status(500).send("Internal Server Error");
+        }
 }
