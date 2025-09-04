@@ -1,15 +1,16 @@
 import { useAppStore } from '@/store'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { apiClient } from '@/lib/api-client'
-import { LOGOUT_ROUTE } from '@/utils/constants'
+import { LOGOUT_ROUTE, UPDATE_PROFILE_ROUTE } from '@/utils/constants'
 import { IoArrowBack } from "react-icons/io5"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { getColor, colors , shadows ,getShadow } from '@/lib/utils'
+import { getColor, colors ,getShadow } from '@/lib/utils'
 import { FaTrash, FaPlus } from "react-icons/fa"
 import { Input } from '@/components/ui/input'
 import { TiTick } from "react-icons/ti";
+import { toast } from 'sonner'
 
 const Profile = () => {
 
@@ -23,18 +24,42 @@ const Profile = () => {
   const [selectedColor, setSelectedColor] = useState(0);
   const [selectedShadow, setSelectedShadow] = useState(0);
 
-  
+  useEffect(() => {
+      if(userInfo.profileSetup)
+      setFirstName(userInfo.firstName)
+      setLastName(userInfo.lastName)
+      setSelectedColor(userInfo.color)
+    
+  }, [userInfo])
 
-  const saveChanges = async () => {
-
+  const validateProfile = () =>{
+    if(!firstName){
+      toast.error("First name is required")
+      return false;
+    }
+    if(!lastName){
+      toast.error("Last name is required")
+      return false;
+    }
+    return true;
   }
 
+  const saveChanges = async () => {
+      if(validateProfile()){
+        try {
+           const res = await apiClient.post(UPDATE_PROFILE_ROUTE,{ firstName , lastName , color: selectedColor },{ withCredentials: true });
 
-
-
-
-
-
+           if(res.status === 200 && res.data){
+            setUserInfo({...res.data});
+            toast.success("Profile updated successfully")
+            navigate("/chat");
+           }
+        } catch (error) {
+          console.log(error)
+        }
+      }
+  }
+  
   const handleLogout = async () => {
     try {
       const response = await apiClient.post(
@@ -44,7 +69,7 @@ const Profile = () => {
 
       if (response.status === 200) {
         alert("Logged out successfully!");
-        window.location.href = "/auth";
+        navigate("/auth")
       } else {
         alert("Logout failed!");
       }
@@ -53,86 +78,107 @@ const Profile = () => {
     }
   };
 
-
-
-
-
-
-
-
   return (
+
     <div
-      className="absolute inset-0 -z-10 h-full w-full items-center flex  justify-center flex-col gap-10"
-      style={{
-        background: `radial-gradient(125% 125% at 50% 10%, #000 60%, ${getShadow(selectedShadow)} 100%)`
-      }}
-    >
+  className="absolute inset-0 -z-10 h-full w-full flex items-center justify-center px-4 sm:px-6 md:px-10 py-8"
+  style={{
+    background: `radial-gradient(125% 125% at 50% 10%, #000 60%, ${getShadow(selectedShadow)} 100%)`
+  }}
+>
+  <Button onClick={handleLogout} className="absolute top-2 right-2">Logout</Button>
 
+  <div
+    className={`relative flex flex-col gap-6 sm:gap-8 md:gap-10 
+                w-full sm:w-[90%] md:w-[60%] lg:w-[40%] 
+                px-4 sm:px-6 md:px-7 py-6 md:py-7
+                rounded-4xl border-2 border-neutral-800 shadow-md
+                bg-black/40`}
 
-      <Button onClick={handleLogout} className="absolute top-2 right-2">Logout</Button>
+    style={{ boxShadow: `0 8px 20px ${getShadow(selectedShadow)}` }}
+  >
+    <div>
+      <IoArrowBack className="absolute left-4 top-3 p-2 text-3xl sm:text-4xl text-white/90 cursor-pointer hover:bg-[#252525] hover:rounded-full" />
+    </div>
 
-
-      <div className= {`relative flex flex-col gap-10 w-[80vw] md:w-max  px-15 pb-15 rounded-4xl border-2 border-neutral-800 shadow-[${getShadow(selectedShadow)}] shadow-md`} >
-        <div>
-          <IoArrowBack className=' absolute left-4 top-3 p-2 text-4xl text-white/90  cursor-pointer hover:bg-[#252525] hover:rounded-full' />
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="flex flex-col gap-6 sm:gap-8 justify-center items-center">
+        <div
+          className="relative flex items-center justify-center"
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+        >
+          <Avatar className="h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 rounded-full overflow-hidden">
+            {image ? (
+              <AvatarImage src={image} alt="profile" className="object-cover w-full h-full bg-black" />
+            ) : (
+              <div
+                className={`uppercase h-full w-full flex items-center justify-center text-4xl sm:text-5xl md:text-6xl rounded-full ${getColor(selectedColor)}`}
+              >
+                {firstName ? firstName[0] : userInfo.email[0]}
+              </div>
+            )}
+          </Avatar>
+          {hovered && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer text-white">
+              {image ? <FaTrash className="text-2xl sm:text-3xl" /> : <FaPlus className="text-2xl sm:text-3xl" />}
+            </div>
+          )}
         </div>
-        <div className="grid grid-cols-2">
-          <div className='flex gap-8 flex-col justify-center'>
-
-          
-          <div className="pl-10 h-32 w-32 relative flex items-center justify-center" onMouseEnter={() => { setHovered(true) }} onMouseLeave={() => { setHovered(false) }}>
-
-            <Avatar className="h-32 w-32  rounded-full overflow-hidden">
-              {
-                image ? (<AvatarImage src={image} alt="profile" className="object-cover w-full h-full bg-black" />)
-                  : (<div className={`uppercase h-32 w-32 text-6xl border-[1px] flex items-center justify-center rounded-full  ${getColor(selectedColor)}`}>
-                    {firstName ? firstName.split("").shift() : userInfo.email.split("").shift()}
-                  </div>)
-              }
-            </Avatar>
-            {
-              hovered && (<div className="items-center justify-center absolute bg-black/50 rounded-full cursor-pointer text-white" > {image ? <FaTrash className='text-3xl cursor-pointer' /> : <FaPlus className='text-3xl cursor-pointer' />} </div>)
-            }
-          </div>
-
-          <div className='w-full flex gap-5'>
-              {
-                colors.map((color, index) => <div key={index}
-                  className={`${color} h-8 w-8 rounded-full cursor-pointer transition-all duration-300 relative`}
-                  onClick={() => {
-                    setSelectedColor(index)
-                    setSelectedShadow(index)
-                  }}
-                >
-                  {
-                    (selectedColor === index) ? <TiTick className="text-white/70 absolute top-2 right-2 " /> : ""
-
-                  }
-                </div>
-                )
-              }
+        <div className="flex gap-3 flex-wrap justify-center md:justify-start">
+          {colors.map((color, index) => (
+            <div
+              key={index}
+              className={`${color} h-7 w-7 sm:h-8 sm:w-8 rounded-full cursor-pointer transition-all duration-300 relative`}
+              onClick={() => {
+                setSelectedColor(index);
+                setSelectedShadow(index);
+              }}
+            >
+              {selectedColor === index && (
+                <TiTick className="text-white/70 absolute top-2 right-2" />
+              )}
             </div>
-            </div>
-
-          <div className='flex min-w-32 md:min-w-64 flex-col gap-5 text-white items-center justify-center'>
-            <div className='w-full'>
-              <Input placeholder="Email" type="email" disabled value={userInfo.email} className="rounded-2xl p-6 bg-[#161616] border-white" />
-            </div>
-            <div className='w-full'>
-              <Input placeholder="First Name" type="text" onChange={(e) => setFirstName(e.target.value)} value={firstName} className="rounded-2xl p-6 text-white bg-greyI border-1 border-black focus:ring-0 focus:ring-offset-0 focus:ring-white focus:border-white" />
-            </div>
-            <div className='w-full'>
-              <Input placeholder="Last Name" type="text" onChange={(e) => setLastName(e.target.value)} className="rounded-2xl p-6 text-white bg-greyI border-1 border-black focus:ring-0 focus:ring-offset-0 focus:ring-white focus:border-white" />
-            </div>
-            
-          </div>
-        </div>
-        <div className='w-full'>
-          <Button className='h-13 w-full transition-all duration-300 rounded-lg text-xl hover:bg-[#262626]'
-           onClick={saveChanges} > Save changes</Button>
+          ))}
         </div>
       </div>
+
+      <div className="flex flex-col gap-4 sm:gap-5 mt-2 text-white w-full">
+        <Input
+          placeholder="Email"
+          type="email"
+          disabled
+          value={userInfo.email}
+          className="rounded-xl p-4 sm:p-5 bg-[#161616] border-white w-full md:h-12"
+        />
+        <Input
+          placeholder="First Name"
+          type="text"
+          onChange={(e) => setFirstName(e.target.value)}
+          value={firstName}
+          className="rounded-xl p-4 sm:p-5 text-white bg-greyI border border-black focus:ring-0 focus:border-white w-full md:h-12"
+        />
+        <Input
+          placeholder="Last Name"
+          type="text"
+          onChange={(e) => setLastName(e.target.value)}
+          value={lastName}
+          className="rounded-xl p-4 sm:p-5 text-white bg-greyI border border-black focus:ring-0 focus:border-white w-full md:h-12"
+        />
+      </div>
     </div>
+
+    <div className="w-full">
+      <Button
+        className="h-10 w-full transition-all duration-300 rounded-lg text-lg sm:text-xl hover:bg-[#262626]"
+        onClick={saveChanges}
+      >
+        Save changes
+      </Button>
+    </div>
+  </div>
+</div>
+
   )
 }
 
