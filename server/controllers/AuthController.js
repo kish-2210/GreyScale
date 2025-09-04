@@ -86,3 +86,44 @@ export const getUserInfo = async(req,res) => {
           return res.status(500).send("Internal Server Error");
         }
 }
+
+export const logout = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,   // true in production (requires HTTPS)
+    sameSite: "strict"
+  });
+  res.status(200).json({ message: "Logged out successfully" });
+}
+
+export const updateProfile = async (req,res) =>
+    {
+        try {
+            const { userId } = req;
+            const { firstName , lastName , color } = req.body
+
+            if(!firstName || !lastName || !color) return res.status(400).Send("Please setup your profile")
+             
+            const userData = await User.findByIdAndUpdate(userId,{
+                firstName,
+                lastName,
+                color, 
+                profileSetup: true
+            },
+            {new: true, runValidators: true }
+        );
+         
+            return res.status(200).json({
+                 id: userData.id,
+                  email: userData.email,
+                  firstName: userData.firstName,
+                  lastName : userData.lastName,
+                  image: userData.image,
+                  color: userData.color,
+        })
+        } catch (error){
+          console.log( { error });
+          return res.status(500).send("Internal Server Error");
+        }
+
+}
