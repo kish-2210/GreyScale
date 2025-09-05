@@ -1,9 +1,9 @@
 import { useAppStore } from '@/store'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { apiClient } from '@/lib/api-client'
-import { LOGOUT_ROUTE, UPDATE_PROFILE_ROUTE } from '@/utils/constants'
+import { ADD_PROFILE_IMAGE_ROUTE, HOST, LOGOUT_ROUTE, REMOVE_PROFILE_IMAGE_ROUTE, UPDATE_PROFILE_ROUTE } from '@/utils/constants'
 import { IoArrowBack } from "react-icons/io5"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { getColor, colors ,getShadow } from '@/lib/utils'
@@ -23,12 +23,18 @@ const Profile = () => {
   const [hovered, setHovered] = useState(false)
   const [selectedColor, setSelectedColor] = useState(0);
   const [selectedShadow, setSelectedShadow] = useState(0);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
-      if(userInfo.profileSetup)
+      if(userInfo.profileSetup){
       setFirstName(userInfo.firstName)
       setLastName(userInfo.lastName)
       setSelectedColor(userInfo.color)
+      }
+      if(userInfo.image){
+        setImage(`${HOST}/${userInfo.image}`)
+      }
+      
     
   }, [userInfo])
 
@@ -59,7 +65,7 @@ const Profile = () => {
         }
       }
   }
-  
+
   const handleLogout = async () => {
     try {
       const response = await apiClient.post(
@@ -77,6 +83,50 @@ const Profile = () => {
       console.error("Error logging out:", err);
     }
   };
+
+  const handleNavigate = ()=>{
+    if(userInfo.profileSetup){
+      navigate("/chat")
+    }
+    else{
+      toast.error("Please setup profile");
+    }
+  }
+
+  const handleFileInputClick = () =>{
+    fileInputRef.current.click();
+  }
+
+  const handleImageChange = async (event) =>{
+         const file = event.target.files[0]
+         console.log({file});
+
+         if(file){
+          const formData = new FormData();
+          formData.append("profile-image",file);
+          const res = await apiClient.post(ADD_PROFILE_IMAGE_ROUTE,formData,{withCredentials: true})
+          if(res.status === 200 && res.data.image){
+            setUserInfo({...userInfo, image: res.data.image});
+            toast.success("Image updated successfully");
+            event.target.value = "";
+          }
+         }
+  }
+  
+  const handleDeleteImage = async()=>{
+   try {
+      const res = await apiClient.delete(REMOVE_PROFILE_IMAGE_ROUTE,{
+        withCredentials: true
+      });
+      if(res.status===200){
+        setUserInfo({...userInfo, image:null })
+        toast.success("Image removed successfully")
+        setImage(null);
+      }
+   } catch (err) {
+     console.log(err)
+   }
+  }
 
   return (
 
@@ -97,7 +147,7 @@ const Profile = () => {
 
     style={{ boxShadow: `0 8px 20px ${getShadow(selectedShadow)}` }}
   >
-    <div>
+    <div onClick={handleNavigate}>
       <IoArrowBack className="absolute left-4 top-3 p-2 text-3xl sm:text-4xl text-white/90 cursor-pointer hover:bg-[#252525] hover:rounded-full" />
     </div>
 
@@ -120,10 +170,14 @@ const Profile = () => {
             )}
           </Avatar>
           {hovered && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer text-white">
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer text-white"
+              onClick={image ? handleDeleteImage : handleFileInputClick}>
               {image ? <FaTrash className="text-2xl sm:text-3xl" /> : <FaPlus className="text-2xl sm:text-3xl" />}
             </div>
           )}
+          <input type="file" ref={fileInputRef} className='hidden' onChange={handleImageChange} 
+          name="profile-image" 
+          accept='.png, .jpg, .jpeg, .svg, .webp' />
         </div>
         <div className="flex gap-3 flex-wrap justify-center md:justify-start">
           {colors.map((color, index) => (
