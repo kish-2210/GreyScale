@@ -66,7 +66,7 @@ export const login = async(req,res) =>{
         
     } catch (error) {
         console.log(`Error: ${error}`);
-        return res.status(501).send("Internal Server Error")
+        return res.status(501).json({message : "Internal Server Error"})
     }
 }
 
@@ -92,7 +92,7 @@ export const getUserInfo = async(req,res) => {
 export const logout = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: true,   // true in production (requires HTTPS)
+    secure: true,
     sameSite: "strict"
   });
   res.status(200).json({ message: "Logged out successfully" });

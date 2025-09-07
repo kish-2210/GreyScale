@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tiny5&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Story+Script&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@100..900&display=swap');
+
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -123,12 +129,45 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.geist {
+  font-family: "Geist", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+.Logotwo {
+  font-family: "Tiny5", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+.Logoone {
+  font-family: "Story Script", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.Logothree{
+   font-family: "Bitcount Prop Double", system-ui;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "slnt" 0,
+    "CRSV" 0.5,
+    "ELSH" 0,
+    "ELXP" 0;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+    font-family: "Geist", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
   }
 }
 

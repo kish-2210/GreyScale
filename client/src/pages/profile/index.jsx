@@ -132,9 +132,8 @@ const Profile = () => {
 
     <div
   className="absolute inset-0 -z-10 h-full w-full flex items-center justify-center px-4 sm:px-6 md:px-10 py-8"
-  style={{
-    background: `radial-gradient(125% 125% at 50% 10%, #000 60%, ${getShadow(selectedShadow)} 100%)`
-  }}
+  style={{ background:`radial-gradient(125% 125% at 50% 10%, #000 60%, ${getShadow(selectedShadow)} 100%)` }}
+
 >
   <Button onClick={handleLogout} className="absolute top-2 right-2">Logout</Button>
 
@@ -190,7 +189,7 @@ const Profile = () => {
               }}
             >
               {selectedColor === index && (
-                <TiTick className="text-white/70 absolute top-2 right-2" />
+                <TiTick className="text-white/70 absolute right-[5px] top-[5px] md:top-2 md:right-2" />
               )}
             </div>
           ))}

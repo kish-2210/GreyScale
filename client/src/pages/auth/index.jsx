@@ -19,6 +19,8 @@ const Auth = () => {
   const { setUserInfo } = useAppStore();
   
   const validateLogin = ()=>{
+    console.log("hii")
+    console.log(email,password);
     if(!email.length){
       toast.error("Email is required")
       return false;
