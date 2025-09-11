@@ -12,13 +12,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { toast } from 'sonner'
+import { apiClient } from '@/lib/api-client'
+import { LOGOUT_ROUTE } from '@/utils/constants'
 
 const ProfileInfo = () => {
-  const { userInfo } = useAppStore()
+  const { userInfo , setUserInfo } = useAppStore()
   const navigate = useNavigate();
 
   const handleLogout = async() =>{
-
+        try {
+          const response = await apiClient.post(LOGOUT_ROUTE,{},{withCredentials:true})
+          if(response.status === 200){
+             navigate("/auth")
+             setUserInfo(null)
+          }
+        } catch (error) {
+           console.log(error)
+           toast
+        }
   }
   return (
     <>

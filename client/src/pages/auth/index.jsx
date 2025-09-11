@@ -19,8 +19,6 @@ const Auth = () => {
   const { setUserInfo } = useAppStore();
   
   const validateLogin = ()=>{
-    console.log("hii")
-    console.log(email,password);
     if(!email.length){
       toast.error("Email is required")
       return false;
@@ -63,23 +61,21 @@ const Auth = () => {
     try {
       const res = await apiClient.post(
         LOGIN_ROUTE,
-        { email , password }
-      )
+        { email , password }, { withCredentials: true });
+      
       
       if(res.status === 200){
-        console.log(document.cookie);
         setUserInfo(res.data.user)
-        toast(res.data.message)
-        if(res.data.user.profileSetup) navigate("/chat")
-        else navigate("/profile")
+        toast("Login Successful")
+        if(res.data.user.profileSetup){ navigate("/chat")}
+        else {navigate("/profile")}
       }
 
     }
     catch (error) 
     {
+      toast(error.response.data)
       console.log(`error : ${error}`)
-      toast(error.response.data.message)
-      console.log(error)
     }
   }
 }
@@ -96,7 +92,6 @@ const Auth = () => {
         setUserInfo(res.data.user)
         navigate("/profile");
       }
-        console.log(res)
       } catch (error) {
         toast(error.response.data)
         console.log(error)
@@ -111,26 +106,26 @@ const Auth = () => {
           <div className="flex flex-col gap-10 items-center justify-center">
             <div className="flex items-center justify-center flex-col">
               <div className="flex items-center justify-center">
-                <h1 className="text-white text-5xl font-bold md:text-6xl">
-                  Vibrant
+                <h1 className="text-white text-4xl  md:text-5xl font-bold lg:text-6xl">
+          
+                  <span className='Logothree'>GREY</span>
+                  <span className="Logotwo">Scale</span>
                 </h1>
               </div>
-              <p className="font-medium text-center text-[#A1A1AA]">
-                Fill in the details to get started with best chat app
-              </p>
+              
             </div>
 
             <div className="flex items-center justify-center w-full">
               <Tabs  defaultValue="login" className="w-full md:w-[90%]">
                 <TabsList className="bg-transparent w-full flex gap-3">
                   <TabsTrigger
-                    className={`w-full text-gray-400 hover:text-white rounded-xl py-4 text-lg data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-lg hover:bg-neutral-800 transition-colors duration-300`}
+                    className={`w-full font-bold text-gray-400 hover:text-white rounded-xl py-4 text-lg data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-lg hover:bg-neutral-800 transition-colors duration-300`}
                     value="login"
                   >
                     Login
                   </TabsTrigger>
                   <TabsTrigger
-                    className={`w-full text-gray-400 hover:text-white rounded-xl py-4 text-lg data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-lg hover:bg-neutral-800 transition-colors duration-300`}
+                    className={`w-full font-bold text-gray-400 hover:text-white rounded-xl py-4 text-lg data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-lg hover:bg-neutral-800 transition-colors duration-300`}
                     value="signup"
                   >
                     Sign up
@@ -150,7 +145,7 @@ const Auth = () => {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                   <Button
-                    className="rounded-xl p-6 text-lg w-full font-bold text-black bg-white hover:bg-Bhover"
+                    className="rounded-xl font-extrabold p-6 text-lg w-full  text-black bg-white hover:bg-Bhover"
                     onClick={handleLogin}
                   >Login</Button>
                 </TabsContent >
@@ -176,7 +171,7 @@ const Auth = () => {
                   />
 
                   <Button
-                    className="rounded-xl p-6 text-lg w-full font-bold text-black bg-white hover:bg-Bhover"
+                    className="rounded-xl p-6 text-lg w-full font-extrabold text-black bg-white hover:bg-Bhover"
                     onClick={handleSignup}
                   >Sign up</Button>
                 </TabsContent>

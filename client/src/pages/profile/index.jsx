@@ -66,23 +66,6 @@ const Profile = () => {
       }
   }
 
-  const handleLogout = async () => {
-    try {
-      const response = await apiClient.post(
-        LOGOUT_ROUTE,
-        { withCredentials: true }
-      );
-
-      if (response.status === 200) {
-        alert("Logged out successfully!");
-        navigate("/auth")
-      } else {
-        alert("Logout failed!");
-      }
-    } catch (err) {
-      console.error("Error logging out:", err);
-    }
-  };
 
   const handleNavigate = ()=>{
     if(userInfo.profileSetup){
@@ -135,7 +118,6 @@ const Profile = () => {
   style={{ background:`radial-gradient(125% 125% at 50% 10%, #000 60%, ${getShadow(selectedShadow)} 100%)` }}
 
 >
-  <Button onClick={handleLogout} className="absolute top-2 right-2">Logout</Button>
 
   <div
     className={`relative flex flex-col gap-6 sm:gap-8 md:gap-10 

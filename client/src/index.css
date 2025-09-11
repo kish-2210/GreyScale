@@ -158,6 +158,12 @@
     "ELXP" 0;
 }
 
+.Logobg{
+  background: #000000; 
+  background: -webkit-linear-gradient(to right, #000000, #272727);
+  background: linear-gradient(to right, #000000, #272727);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

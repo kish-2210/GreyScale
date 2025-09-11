@@ -43,7 +43,6 @@ const App = () => {
 
       } catch (error) {
         setUserInfo(undefined)
-        toast(error.response.data);
       }
       finally{
         setLoading(false);

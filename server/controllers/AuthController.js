@@ -19,7 +19,13 @@ export const signup = async(req,res) =>{
             return res.status(406).send("User already exist, Please login");
         }
         const user =  await User.create({email,password})
-        res.cookie("jwt",createToken(email,user.id),{maxAge, secure: true, sameSite: "None",});
+        res.cookie("jwt", createToken(email, user.id), {
+  httpOnly: true,                          // prevent JS access
+  secure: true, // only secure in prod
+  sameSite: "None",
+  path: "/",                               // important for logout matching
+  maxAge
+});
         return res.status(201).json({
             message: "Signup Successful",
             user:{
@@ -38,18 +44,24 @@ export const login = async(req,res) =>{
     try {
         const { email, password } = req.body;
         if(!email?.trim() || !password?.trim()){
-            return res.status(401).json({message:"Email and password are required"})
+            return res.status(401).send("Email and password are required")
         }
         const user = await User.findOne({email: email})
         if(!user){
-            return res.status(404).json({message: "User not found"})
+            return res.status(404).send("User not found")
         }
         const auth = await compare (password,user.password)
         if(!auth){
-            return res.status(400).json({message: "Incorrect password"})
+            return res.status(400).send("Incorrect password")
         }
         else{
-            res.cookie("jwt", createToken(email,user.id), {maxAge,secure: true, sameSite: "None"})
+            res.cookie("jwt", createToken(email, user.id), {
+  httpOnly: true,                          // prevent JS access
+  secure: true, // only secure in prod
+  sameSite: "None",
+  path: "/",                               // important for logout matching
+  maxAge
+});
             return res.status(200).json({
                 message: "Login Successful",
                 user:{
@@ -59,14 +71,14 @@ export const login = async(req,res) =>{
                   lastName : user.lastName,
                   image: user.image,
                   color: user.color,
-                  profileSetup: userData.profileSetup,
+                  profileSetup: user.profileSetup,
                 }
             })
         }
         
     } catch (error) {
         console.log(`Error: ${error}`);
-        return res.status(501).json({message : "Internal Server Error"})
+        return res.status(501).send("Server error")
     }
 }
 
@@ -89,14 +101,21 @@ export const getUserInfo = async(req,res) => {
         }
 }
 
-export const logout = (req, res) => {
-  res.clearCookie("token", {
+export const logout = (req, res) => 
+    {
+        try {
+    res.clearCookie("jwt", {
     httpOnly: true,
     secure: true,
-    sameSite: "strict"
+    sameSite: "None",
+    path: "/"
   });
-  res.status(200).json({ message: "Logged out successfully" });
-}
+  return res.status(200).send("Logged out");
+        } catch (error) {
+           console.log({error});
+           res.status(500).send("Logout unsuccessful") 
+        }
+  }
 
 export const updateProfile = async (req,res) =>
     {
