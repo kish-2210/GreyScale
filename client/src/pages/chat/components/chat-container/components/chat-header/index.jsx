@@ -1,4 +1,4 @@
-import { Avatar } from '@/components/ui/avatar';
+import { Avatar , AvatarImage } from '@/components/ui/avatar';
 import { getColor } from '@/lib/utils';
 import { useAppStore } from '@/store'
 import { HOST } from '@/utils/constants';
@@ -9,7 +9,7 @@ const ChatHeader = () => {
 
   return (
     <div className="h-[10vh] border-b-2 border-[#2f303b] flex items-center justify-between md:px-3 pr-10 pl-3 ">
-  {/* Left: Avatar + User Info */}
+
   <div className="flex items-center gap-2 sm:gap-3 md:gap-5 flex-1 min-w-0">
     <Avatar className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-md overflow-hidden">
       {selectedChatData.image ? (
