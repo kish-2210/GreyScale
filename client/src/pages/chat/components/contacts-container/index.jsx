@@ -39,7 +39,7 @@ useEffect(() => {
 
 
       <div className="my-5" >
-        <div className="flex items-center justify-between pr-10">
+        <div className="flex items-center md:justify-between justify-center md:pr-10 w-full">
           <Title text="Direct Messages" />
           <Newdm/>
         </div>
@@ -48,11 +48,7 @@ useEffect(() => {
         </div>
       </div>
 
-      <div className="my-5" >
-        <div className="flex items-center justify-between pr-10">
-          <Title text="Channels" />
-        </div>
-      </div>
+ 
       <ProfileInfo />
     </div>
   )
@@ -62,7 +58,7 @@ export default ContactsContainer
 
 const Title = ({ text }) => {
   return (
-    <h6 className="uppercase tracking-widest text-neutral-400 pl-10 font-light text-opacity-90 text-sm">
+    <h6 className="hidden md:block uppercase tracking-widest text-neutral-400 pl-10 font-light text-opacity-90 text-sm">
       {text}
     </h6>
   )

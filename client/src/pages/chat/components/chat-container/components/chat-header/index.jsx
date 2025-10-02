@@ -40,7 +40,7 @@ const ChatHeader = () => {
     </div>
   </div>
 
-  {/* Right: Close Button */}
+
   <button
     className="text-neutral-500 hover:text-white focus:outline-none transition-all duration-300 flex-shrink-0 ml-2"
     onClick={closeChat}
